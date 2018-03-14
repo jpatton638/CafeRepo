@@ -1,4 +1,4 @@
-import Cafe.{SemiSkimmedMilk, WholeMilk}
+import Cafe._
 import org.scalatest.{MustMatchers, WordSpec}
 
 class CafeSpec extends WordSpec with MustMatchers {
@@ -8,27 +8,27 @@ class CafeSpec extends WordSpec with MustMatchers {
     "heat is called" must {
 
       "return Water when called" in {
-        Cafe.heat(Cafe.Water()) mustEqual Cafe.Water(40)
+        heat(Water()) mustEqual Water(40)
       }
 
       "return Water with default 40 if no temperature given" in {
-        Cafe.heat(Cafe.Water()) mustEqual Cafe.Water(40)
+        heat(Water()) mustEqual Water(40)
       }
 
       "return Water with given temperature" in {
-        Cafe.heat(Cafe.Water(), 80.0) mustEqual Cafe.Water(80)
+        heat(Water(), 80.0) mustEqual Water(80)
       }
     }
 
     "grind is called" must {
 
       "return GroundCoffee when given Arabica Beans" in {
-        Cafe.grind("Arabica Beans") mustEqual Cafe.GroundCoffee("Arabica Beans")
+        grind("Arabica Beans") mustEqual GroundCoffee("Arabica Beans")
       }
 
       "throw a IllegalArgumentException when given anything else" in {
         intercept[IllegalArgumentException] {
-          Cafe.grind("baked beans")
+          grind("baked beans")
         }
       }
 
@@ -37,18 +37,30 @@ class CafeSpec extends WordSpec with MustMatchers {
     "frothMilk is called" must {
 
       "return frothed milk when given whole milk" in {
-        Cafe.frothMilk(new WholeMilk) mustEqual Cafe.FrothedMilk(new WholeMilk)
+        frothMilk(new WholeMilk) mustEqual FrothedMilk(new WholeMilk)
       }
 
       "throw a IllegalArgumentException when given semi skimmed milk" in {
         intercept[IllegalArgumentException] {
-          Cafe.frothMilk(new SemiSkimmedMilk)
+          frothMilk(new SemiSkimmedMilk)
         }
       }
 
     }
+
     "brew is called" must {
 
+      "return Coffee when water is 40 degrees or above" in {
+
+        brew(Water(40), GroundCoffee("Arabica Beans")) mustEqual Coffee()
+      }
+
+      "throw BrewingExeption when temperature is too low" in {
+        val ex = intercept[BrewingException] {
+          brew(Water(39), GroundCoffee("Arabica Beans"))
+        }
+        ex.getMessage mustEqual "The water is too cold"
+      }
     }
   }
 }

@@ -2,7 +2,7 @@ object Cafe {
 
   case class Water(temperature: Double = 20.0)
   case class GroundCoffee(name: String)
-  case class Coffee(name: String, milky: Option[Milk])
+  case class Coffee()
   case class FrothedMilk(milk: Milk)
 
   trait Milk
@@ -11,6 +11,8 @@ object Cafe {
   case class SemiSkimmedMilk() extends Milk
 
   type CoffeeBeans = String
+
+  case class BrewingException() extends Exception("The water is too cold")
 
   def heat(water: Water, temperature: Double = 40.0): Water = {
     Water(temperature)
@@ -33,6 +35,10 @@ object Cafe {
   }
 
   def brew(water: Water, coffee: GroundCoffee): Coffee = {
-    ???
+    if (water.temperature >= 40) {
+      Coffee()
+    } else {
+      throw new BrewingException
+    }
   }
 }
