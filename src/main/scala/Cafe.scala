@@ -2,8 +2,8 @@ object Cafe {
 
   case class Water(temperature: Double = 20.0)
   case class GroundCoffee(name: String)
-  case class Coffee()
   case class FrothedMilk(milk: Milk)
+  case class Coffee(milk: Option[FrothedMilk], temperature: Double)
 
   trait Milk
 
@@ -34,9 +34,14 @@ object Cafe {
     }
   }
 
-  def brew(water: Water, coffee: GroundCoffee): Coffee = {
-    if (water.temperature >= 40) {
-      Coffee()
+  def brew(water: Water, coffee: GroundCoffee, milk: Option[FrothedMilk] = None): Coffee = {
+    val temp = water.temperature
+    if (temp >= 40) {
+      if (milk.contains(FrothedMilk(new WholeMilk))) {
+        Coffee(milk, temp-5)
+      } else {
+        Coffee(milk, temp)
+      }
     } else {
       throw new BrewingException
     }
