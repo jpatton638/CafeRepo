@@ -1,3 +1,6 @@
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+
 object Cafe extends App {
 
   case class Water(temperature: Double = 20.0)
@@ -14,11 +17,11 @@ object Cafe extends App {
 
   case class BrewingException() extends Exception("The water is too cold")
 
-  def heat(water: Water, temperature: Double = 40.0): Water = {
-    Water(temperature)
+  def heat(water: Water, temperature: Double = 40.0): Future[Water] = Future {
+    water.copy(temperature)
   }
 
-  def grind(beans: CoffeeBeans): GroundCoffee = {
+  def grind(beans: CoffeeBeans): Future[GroundCoffee] = Future {
     if (beans.toLowerCase == "arabica beans") {
       GroundCoffee(beans)
     } else {
@@ -26,7 +29,7 @@ object Cafe extends App {
     }
   }
 
-  def frothMilk(milk: Milk): FrothedMilk = {
+  def frothMilk(milk: Milk): Future[FrothedMilk] = Future {
     if (milk.isInstanceOf[WholeMilk]) {
       FrothedMilk(milk)
     } else {
@@ -34,7 +37,7 @@ object Cafe extends App {
     }
   }
 
-  def brew(water: Water, groundCoffee: GroundCoffee, milk: Option[FrothedMilk] = None): Coffee = {
+  def brew(water: Water, groundCoffee: GroundCoffee, milk: Option[FrothedMilk] = None): Future[Coffee] = Future {
     val temp = water.temperature
     if (temp >= 40) {
       if (milk.isDefined) {
@@ -43,7 +46,7 @@ object Cafe extends App {
         println(f"You have brewed the following coffee: Coffee at ${temp-5}%2.2f degrees with $splitMilk%s")
         Coffee(groundCoffee, milk, temp-5)
       } else {
-        println(f"You	have brewed the following	coffee:	Coffee at	$temp%2.2f degrees without milk")
+        println(f"You	have brewed the following coffee: Coffee at $temp%2.2f degrees without milk")
         Coffee(groundCoffee, milk, temp)
       }
     } else {
@@ -51,5 +54,5 @@ object Cafe extends App {
     }
   }
 
-  brew(heat(Water()), grind("Arabica Beans"), Some(frothMilk(WholeMilk())))
+
 }

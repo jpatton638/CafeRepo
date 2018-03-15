@@ -1,34 +1,46 @@
 import Cafe._
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.{AsyncWordSpec, MustMatchers}
 
-class CafeSpec extends WordSpec with MustMatchers {
+import scala.concurrent.Future
+
+class CafeSpec extends AsyncWordSpec with MustMatchers {
 
   "Cafe" when {
 
     "heat is called" must {
 
       "return Water when called" in {
-        heat(Water()) mustEqual Water(40)
+        heat(Water()) map ( f =>
+            assert(f == Water(40))
+          )
       }
 
       "return Water with default 40 if no temperature given" in {
-        heat(Water()) mustEqual Water(40)
+        heat(Water()) map(f =>
+            assert(f == Water(40))
+          )
       }
 
       "return Water with given temperature" in {
-        heat(Water(), 80.0) mustEqual Water(80)
+        heat(Water(), 80.0) map(f =>
+          assert(f == Water(80))
+          )
       }
     }
 
     "grind is called" must {
 
       "return GroundCoffee when given Arabica Beans" in {
-        grind("Arabica Beans") mustEqual GroundCoffee("Arabica Beans")
+        grind("Arabica Beans") map(f =>
+            assert(f == GroundCoffee("Arabica Beans"))
+          )
       }
 
       "throw a IllegalArgumentException when given anything else" in {
-        intercept[IllegalArgumentException] {
-          grind("baked beans")
+        recoverToSucceededIf[IllegalArgumentException] {
+          grind("Baked Beans") map(f =>
+              assert(f == GroundCoffee("Arabica Beans"))
+            )
         }
       }
 
@@ -37,12 +49,16 @@ class CafeSpec extends WordSpec with MustMatchers {
     "frothMilk is called" must {
 
       "return frothed milk when given whole milk" in {
-        frothMilk(new WholeMilk) mustEqual FrothedMilk(new WholeMilk)
+        frothMilk(new WholeMilk) map(f =>
+            assert(f == FrothedMilk(new WholeMilk))
+          )
       }
 
       "throw a IllegalArgumentException when given semi skimmed milk" in {
-        intercept[IllegalArgumentException] {
-          frothMilk(new SemiSkimmedMilk)
+        recoverToSucceededIf[IllegalArgumentException] {
+          frothMilk(new SemiSkimmedMilk) map(f =>
+              assert(f == FrothedMilk(new WholeMilk))
+            )
         }
       }
 
@@ -52,19 +68,25 @@ class CafeSpec extends WordSpec with MustMatchers {
 
       "return Coffee when water is 40 degrees or above" in {
 
-        brew(Water(40), GroundCoffee("Arabica Beans")) mustEqual Coffee(GroundCoffee("Arabica Beans"), None, 40)
+        brew(Water(40), GroundCoffee("Arabica Beans")) map(f =>
+            assert(f == Coffee(GroundCoffee("Arabica Beans"), None, 40))
+          )
       }
 
       "return coffee with milk if milk wanted, reducing temp by 5 degrees" in {
 
-        brew(Water(40), GroundCoffee("Arabica Beans"), Some(FrothedMilk(new WholeMilk))) mustEqual Coffee(GroundCoffee("Arabica Beans"), Some(FrothedMilk(new WholeMilk)), 35)
+        brew(Water(40), GroundCoffee("Arabica Beans"), Some(FrothedMilk(new WholeMilk))) map(f =>
+            assert(f == Coffee(GroundCoffee("Arabica Beans"), Some(FrothedMilk(new WholeMilk)), 35))
+          )
       }
 
       "throw BrewingExeption when temperature is too low" in {
-        val ex = intercept[BrewingException] {
+        val ex: Future[BrewingException] = recoverToExceptionIf[BrewingException] {
           brew(Water(39), GroundCoffee("Arabica Beans"))
         }
-        ex.getMessage mustEqual "The water is too cold"
+        ex.map( e =>
+          e.getMessage mustEqual "The water is too cold"
+        )
       }
     }
   }
