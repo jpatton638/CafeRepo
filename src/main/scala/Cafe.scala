@@ -1,9 +1,9 @@
-object Cafe {
+object Cafe extends App {
 
   case class Water(temperature: Double = 20.0)
   case class GroundCoffee(name: String)
   case class FrothedMilk(milk: Milk)
-  case class Coffee(milk: Option[FrothedMilk], temperature: Double)
+  case class Coffee(groundCoffee: GroundCoffee, milk: Option[FrothedMilk], temperature: Double)
 
   trait Milk
 
@@ -34,16 +34,22 @@ object Cafe {
     }
   }
 
-  def brew(water: Water, coffee: GroundCoffee, milk: Option[FrothedMilk] = None): Coffee = {
+  def brew(water: Water, groundCoffee: GroundCoffee, milk: Option[FrothedMilk] = None): Coffee = {
     val temp = water.temperature
     if (temp >= 40) {
-      if (milk.contains(FrothedMilk(new WholeMilk))) {
-        Coffee(milk, temp-5)
+      if (milk.isDefined) {
+        val findMilk = "([A-Z][a-z]+)".r
+        val splitMilk = findMilk.findAllIn(milk.get.milk.toString).mkString(" ")
+        println(f"You have brewed the following coffee: Coffee at ${temp-5}%2.2f degrees with $splitMilk%s")
+        Coffee(groundCoffee, milk, temp-5)
       } else {
-        Coffee(milk, temp)
+        println(f"You	have brewed the following	coffee:	Coffee at	$temp%2.2f degrees without milk")
+        Coffee(groundCoffee, milk, temp)
       }
     } else {
       throw new BrewingException
     }
   }
+
+  brew(heat(Water()), grind("Arabica Beans"), Some(frothMilk(WholeMilk())))
 }
