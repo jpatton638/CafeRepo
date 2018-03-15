@@ -66,17 +66,10 @@ class CafeSpec extends AsyncWordSpec with MustMatchers {
 
     "brew is called" must {
 
-      "return Coffee when water is 40 degrees or above" in {
+      "return Espresso when water is 40 degrees or above" in {
 
         brew(Water(40), GroundCoffee("Arabica Beans")) map(f =>
-            assert(f == Coffee(GroundCoffee("Arabica Beans"), None, 40))
-          )
-      }
-
-      "return coffee with milk if milk wanted, reducing temp by 5 degrees" in {
-
-        brew(Water(40), GroundCoffee("Arabica Beans"), Some(FrothedMilk(new WholeMilk))) map(f =>
-            assert(f == Coffee(GroundCoffee("Arabica Beans"), Some(FrothedMilk(new WholeMilk)), 35))
+            assert(f == Espresso(GroundCoffee("Arabica Beans"), Water(40) , 40))
           )
       }
 
@@ -87,6 +80,18 @@ class CafeSpec extends AsyncWordSpec with MustMatchers {
         ex.map( e =>
           e.getMessage mustEqual "The water is too cold"
         )
+      }
+    }
+
+    "prepareCappuccino is called" must {
+
+      "return coffee with milk if milk wanted, reducing temp by 5 degrees" in {
+        val espresso = Espresso(GroundCoffee("Arabica Beans"), Water(40), 40)
+        val froth = FrothedMilk(WholeMilk())
+
+        prepareCappuccino() map(f =>
+          assert(f == Cappuccino(espresso, froth, 35))
+          )
       }
     }
   }
