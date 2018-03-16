@@ -94,5 +94,17 @@ class CafeSpec extends AsyncWordSpec with MustMatchers {
           )
       }
     }
+
+    "printMessage" must {
+
+      "Print the correct string when given a Cappuccino" in {
+        val froth = FrothedMilk(WholeMilk())
+        val cap = Cappuccino(Espresso(GroundCoffee("Arabica Beans"), Water(35), 35), froth, 35)
+
+        printMessage(cap, froth) map( s =>
+          assert(s == "You have brewed the following coffee: Cappuccino at 35.00 degrees with Whole Milk")
+          )
+      }
+    }
   }
 }
