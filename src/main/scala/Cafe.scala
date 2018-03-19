@@ -1,20 +1,13 @@
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
+import java.util.concurrent.Executors
+
+import scala.concurrent.{ExecutionContext, Future}
+
+import models._
 
 object Cafe extends App {
 
-  trait Milk
-  trait Coffee {
-    val temperature = 0.0
-  }
+  implicit def context : ExecutionContext = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
 
-  case class Water(temperature: Double = 20.0)
-  case class GroundCoffee(name: String)
-  case class FrothedMilk(milk: Milk) extends Milk
-  case class Espresso(groundCoffee: GroundCoffee, water: Water, override val temperature: Double) extends Coffee
-  case class Cappuccino(espresso: Espresso, milk: FrothedMilk, override val temperature: Double) extends Coffee
-  case class WholeMilk() extends Milk
-  case class SemiSkimmedMilk() extends Milk
   case class BrewingException() extends Exception("The water is too cold")
 
   type CoffeeBeans = String
@@ -49,15 +42,16 @@ object Cafe extends App {
   }
 
   def prepareCappuccino(): Future[Cappuccino] = {
-    val groundCoffee = grind("Arabica Beans")
-    val heatWater = heat(Water())
-    val frothedMilk = frothMilk(WholeMilk())
-    for {
-      ground <- groundCoffee
-      water <- heatWater
-      foam <- frothedMilk
+
+    val combination = for {
+      ground <- grind("Arabica Beans")
+      water <- heat(Water())
+      foam <- frothMilk(WholeMilk())
       espresso <- brew(water, ground)
     } yield Cappuccino(espresso, foam, water.temperature-5)
+
+    combination.map(c => printMessage(c, c.milk))
+    combination
   }
 
 
@@ -73,5 +67,7 @@ object Cafe extends App {
     println(string)
     string
   }
+
+  prepareCappuccino()
 
 }

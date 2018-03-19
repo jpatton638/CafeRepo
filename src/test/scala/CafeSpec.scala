@@ -1,9 +1,12 @@
-import Cafe._
+import Cafe.{BrewingException, brew, frothMilk, grind, heat, prepareCappuccino, printMessage}
+import models._
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 import scala.concurrent.Future
 
 class CafeSpec extends AsyncWordSpec with MustMatchers {
+
+  implicit override def executionContext = Cafe.context
 
   "Cafe" when {
 
