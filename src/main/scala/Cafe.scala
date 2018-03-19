@@ -50,24 +50,9 @@ object Cafe extends App {
       espresso <- brew(water, ground)
     } yield Cappuccino(espresso, foam, water.temperature-5)
 
-    combination.map(c => printMessage(c, c.milk))
+    println(combination.toString)
     combination
   }
 
-
-  def printMessage(coffee: Coffee, milk: FrothedMilk): Future[String] = Future {
-
-    val coffeeRegex = "^([A-Z][a-z]+)".r
-    val coffeeName = coffeeRegex.findFirstIn(coffee.toString).getOrElse()
-
-    val milkRegex = "\\(([A-Z][a-z]+)".r
-    val milkName = milkRegex.findAllIn(milk.toString).matchData.toList.map(m => m.group(1))
-
-    val string = f"You have brewed the following coffee: $coffeeName at ${coffee.temperature}%2.2f degrees with ${milkName.head}%s Milk"
-    println(string)
-    string
-  }
-
   prepareCappuccino()
-
 }
