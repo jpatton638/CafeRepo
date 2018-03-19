@@ -1,9 +1,12 @@
-import Cafe._
+import Cafe.{BrewingException, brew, frothMilk, grind, heat, prepareCappuccino}
+import models._
 import org.scalatest.{AsyncWordSpec, MustMatchers}
 
 import scala.concurrent.Future
 
 class CafeSpec extends AsyncWordSpec with MustMatchers {
+
+  implicit override def executionContext = Cafe.context
 
   "Cafe" when {
 
@@ -93,18 +96,17 @@ class CafeSpec extends AsyncWordSpec with MustMatchers {
           assert(f == Cappuccino(espresso, froth, 35))
           )
       }
-    }
 
-    "printMessage" must {
+      "Print the correct string when returning a Cappuccino" in {
 
-      "Print the correct string when given a Cappuccino" in {
+        val espresso = Espresso(GroundCoffee("Arabica Beans"), Water(40), 40)
         val froth = FrothedMilk(WholeMilk())
-        val cap = Cappuccino(Espresso(GroundCoffee("Arabica Beans"), Water(35), 35), froth, 35)
+        val coffeeOutput =  Cappuccino(espresso, froth, 35)
 
-        printMessage(cap, froth) map( s =>
-          assert(s == "You have brewed the following coffee: Cappuccino at 35.00 degrees with Whole Milk")
-          )
+        coffeeOutput.toString mustEqual "You have brewed the following coffee: Cappuccino at 35.00 degrees with Whole Milk"
+
       }
     }
+
   }
 }
