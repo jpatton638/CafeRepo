@@ -3,7 +3,7 @@ import java.util.concurrent.Executors
 import models._
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 object Cafe extends App {
 
@@ -53,6 +53,7 @@ object Cafe extends App {
 
     combination onComplete {
       case Success(cap) => println(cap.toString)
+      case Failure(_) => println("Could not prepare")
     }
     combination
   }
