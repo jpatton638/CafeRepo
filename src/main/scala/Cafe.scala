@@ -1,8 +1,9 @@
 import java.util.concurrent.Executors
 
-import scala.concurrent.{ExecutionContext, Future}
-
 import models._
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Success
 
 object Cafe extends App {
 
@@ -50,7 +51,9 @@ object Cafe extends App {
       espresso <- brew(water, ground)
     } yield Cappuccino(espresso, foam, water.temperature-5)
 
-    println(combination.toString)
+    combination onComplete {
+      case Success(cap) => println(cap.toString)
+    }
     combination
   }
 

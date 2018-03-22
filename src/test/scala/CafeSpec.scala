@@ -103,8 +103,9 @@ class CafeSpec extends AsyncWordSpec with MustMatchers {
         val froth = FrothedMilk(WholeMilk())
         val coffeeOutput =  Cappuccino(espresso, froth, 35)
 
-        coffeeOutput.toString mustEqual "You have brewed the following coffee: Cappuccino at 35.00 degrees with Whole Milk"
-
+        prepareCappuccino() map(f =>
+          assert(f.toString == Cappuccino(espresso, froth, 35).toString)
+          )
       }
     }
 
